@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Irregular Verbs Challenge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            soft: '0 20px 60px rgba(79, 70, 229, 0.18)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      padding-top: var(--safe-top);
+      padding-right: var(--safe-right);
+      padding-bottom: var(--safe-bottom);
+      padding-left: var(--safe-left);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    input, button {
+      font-size: 16px; /* Evita el zoom automático de Safari en iPhone */
+      touch-action: manipulation;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      body {
+        min-height: -webkit-fill-available;
+      }
+      main {
+        min-height: -webkit-fill-available;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .mobile-shell {
+        align-items: flex-start;
+        padding: 14px;
+      }
+
+      .mobile-title {
+        font-size: clamp(2rem, 10vw, 2.75rem);
+        line-height: 0.98;
+      }
+
+      .mobile-subtitle {
+        font-size: 1rem;
+        line-height: 1.45;
+      }
+
+      .mobile-card {
+        border-radius: 26px;
+        padding: 18px;
+      }
+
+      .mobile-prompt {
+        font-size: clamp(2rem, 12vw, 3.25rem);
+        line-height: 1;
+        word-break: break-word;
+      }
+
+      .mobile-form {
+        gap: 12px;
+      }
+
+      .answer-input {
+        min-height: 54px;
+        border-radius: 18px;
+        padding: 13px 14px;
+      }
+
+      .mobile-actions {
+        position: sticky;
+        bottom: calc(10px + var(--safe-bottom));
+        z-index: 20;
+        padding: 10px;
+        margin-left: -10px;
+        margin-right: -10px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.74);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 16px 38px rgba(15, 23, 42, 0.16);
+      }
+
+      .mobile-actions button {
+        width: 100%;
+        min-height: 54px;
+        padding: 14px 16px;
+      }
+
+      .mobile-score {
+        border-radius: 26px;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen font-display bg-gradient-to-br from-indigo-100 via-sky-100 to-emerald-100 text-slate-800">
+  <main class="mobile-shell min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <section class="w-full max-w-5xl">
+      <header class="text-center mb-6 sm:mb-8">
+        <p class="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-sm sm:text-base font-semibold text-indigo-700 shadow-sm">
+          ✨ English Practice
+        </p>
+        <h1 class="mobile-title mt-4 text-4xl sm:text-5xl font-black tracking-tight text-slate-900">
+          Irregular Verbs Challenge
+        </h1>
+        <p class="mobile-subtitle mt-3 text-lg sm:text-xl text-slate-600">
+          Practica los verbos irregulares más comunes de forma rápida y divertida.
+        </p>
+      </header>
+
+      <div class="grid lg:grid-cols-[1fr_330px] gap-5">
+        <article class="mobile-card glass-card rounded-3xl backdrop-blur p-5 sm:p-8 shadow-soft border border-white">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <p class="text-sm font-bold uppercase tracking-widest text-indigo-500">Completa el verbo</p>
+              <h2 id="promptText" class="mobile-prompt mt-2 text-3xl sm:text-4xl font-black text-slate-900">---</h2>
+            </div>
+            <div id="promptType" class="self-start sm:self-center rounded-2xl bg-indigo-100 text-indigo-700 px-4 py-3 font-bold">
+              Pregunta aleatoria
+            </div>
+          </div>
+
+          <div id="message" class="hidden mb-5 rounded-2xl px-5 py-4 text-lg font-bold"></div>
+
+          <form id="verbForm" class="mobile-form grid sm:grid-cols-2 gap-4">
+            <label class="block">
+              <span class="block mb-2 font-bold text-slate-700">Infinitive / Base form</span>
+              <input id="base" type="text" autocomplete="off" class="answer-input w-full rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl outline-none transition focus:border-indigo-400 focus:bg-white" placeholder="be" />
+            </label>
+
+            <label class="block">
+              <span class="block mb-2 font-bold text-slate-700">Past simple</span>
+              <input id="past" type="text" autocomplete="off" class="answer-input w-full rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl outline-none transition focus:border-indigo-400 focus:bg-white" placeholder="was / were" />
+            </label>
+
+            <label class="block">
+              <span class="block mb-2 font-bold text-slate-700">Past participle</span>
+              <input id="participle" type="text" autocomplete="off" class="answer-input w-full rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl outline-none transition focus:border-indigo-400 focus:bg-white" placeholder="been" />
+            </label>
+
+            <label class="block">
+              <span class="block mb-2 font-bold text-slate-700">Spanish meaning</span>
+              <input id="spanish" type="text" autocomplete="off" class="answer-input w-full rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl outline-none transition focus:border-indigo-400 focus:bg-white" placeholder="ser / estar" />
+            </label>
+          </form>
+
+          <div id="hintBox" class="hidden mt-5 rounded-2xl bg-amber-100 border border-amber-200 px-5 py-4 text-amber-900 font-semibold"></div>
+
+          <div class="mobile-actions mt-6 flex flex-col sm:flex-row gap-3">
+            <button id="checkBtn" class="rounded-2xl bg-indigo-600 px-6 py-4 text-lg font-black text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700 active:scale-[0.98]">
+              Comprobar respuesta
+            </button>
+            <button id="hintBtn" class="rounded-2xl bg-amber-400 px-6 py-4 text-lg font-black text-amber-950 shadow-lg shadow-amber-100 transition hover:bg-amber-500 active:scale-[0.98]">
+              Pista 💡
+            </button>
+            <button id="nextBtn" class="rounded-2xl bg-emerald-500 px-6 py-4 text-lg font-black text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-600 active:scale-[0.98]">
+              Siguiente verbo →
+            </button>
+          </div>
+        </article>
+
+        <aside class="mobile-score rounded-3xl bg-slate-900 text-white p-5 sm:p-6 shadow-soft">
+          <h3 class="text-2xl font-black mb-5">Tu marcador</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-white/10 p-4">
+              <p class="text-sm text-white/70">Aciertos</p>
+              <p id="correctCount" class="text-3xl font-black text-emerald-300">0</p>
+            </div>
+            <div class="rounded-2xl bg-white/10 p-4">
+              <p class="text-sm text-white/70">Fallos</p>
+              <p id="wrongCount" class="text-3xl font-black text-rose-300">0</p>
+            </div>
+            <div class="rounded-2xl bg-white/10 p-4">
+              <p class="text-sm text-white/70">Racha</p>
+              <p id="streakCount" class="text-3xl font-black text-sky-300">0</p>
+            </div>
+            <div class="rounded-2xl bg-white/10 p-4">
+              <p class="text-sm text-white/70">Éxito</p>
+              <p id="successRate" class="text-3xl font-black text-violet-300">0%</p>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-2xl bg-white/10 p-4">
+            <p class="font-bold text-white/80 mb-2">Consejo</p>
+            <p class="text-white/70 leading-relaxed">
+              Puedes escribir varias opciones separadas por barra. Por ejemplo: <strong>ser / estar</strong> o <strong>was / were</strong>.
+            </p>
+          </div>
+
+          <button id="resetBtn" class="mt-5 w-full rounded-2xl bg-white/10 px-5 py-3 font-bold text-white transition hover:bg-white/20">
+            Reiniciar marcador
+          </button>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const verbs = [
+      { base: 'be', past: 'was / were', participle: 'been', spanish: 'ser / estar' },
+      { base: 'begin', past: 'began', participle: 'begun', spanish: 'empezar / comenzar' },
+      { base: 'break', past: 'broke', participle: 'broken', spanish: 'romper' },
+      { base: 'bring', past: 'brought', participle: 'brought', spanish: 'traer' },
+      { base: 'buy', past: 'bought', participle: 'bought', spanish: 'comprar' },
+      { base: 'come', past: 'came', participle: 'come', spanish: 'venir' },
+      { base: 'do', past: 'did', participle: 'done', spanish: 'hacer' },
+      { base: 'drink', past: 'drank', participle: 'drunk', spanish: 'beber' },
+      { base: 'eat', past: 'ate', participle: 'eaten', spanish: 'comer' },
+      { base: 'find', past: 'found', participle: 'found', spanish: 'encontrar' },
+      { base: 'get', past: 'got', participle: 'got / gotten', spanish: 'conseguir / obtener / recibir' },
+      { base: 'give', past: 'gave', participle: 'given', spanish: 'dar' },
+      { base: 'go', past: 'went', participle: 'gone', spanish: 'ir' },
+      { base: 'have', past: 'had', participle: 'had', spanish: 'tener / haber' },
+      { base: 'know', past: 'knew', participle: 'known', spanish: 'saber / conocer' },
+      { base: 'make', past: 'made', participle: 'made', spanish: 'hacer / fabricar' },
+      { base: 'read', past: 'read', participle: 'read', spanish: 'leer' },
+      { base: 'run', past: 'ran', participle: 'run', spanish: 'correr' },
+      { base: 'say', past: 'said', participle: 'said', spanish: 'decir' },
+      { base: 'see', past: 'saw', participle: 'seen', spanish: 'ver' },
+      { base: 'take', past: 'took', participle: 'taken', spanish: 'tomar / coger / llevar' },
+      { base: 'think', past: 'thought', participle: 'thought', spanish: 'pensar' },
+      { base: 'write', past: 'wrote', participle: 'written', spanish: 'escribir' }
+    ];
+
+    const fields = ['base', 'past', 'participle', 'spanish'];
+    const labels = {
+      base: 'Infinitive / Base form',
+      past: 'Past simple',
+      participle: 'Past participle',
+      spanish: 'Spanish meaning'
+    };
+
+    let currentVerb = null;
+    let currentPromptField = null;
+    let correct = 0;
+    let wrong = 0;
+    let streak = 0;
+    let alreadyChecked = false;
+
+    const promptText = document.getElementById('promptText');
+    const promptType = document.getElementById('promptType');
+    const message = document.getElementById('message');
+    const hintBox = document.getElementById('hintBox');
+
+    function normalize(text) {
+      return text
+        .toLowerCase()
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ');
+    }
+
+    function splitOptions(text) {
+      return normalize(text)
+        .split('/')
+        .map(option => option.trim())
+        .filter(Boolean);
+    }
+
+    function isAnswerCorrect(userAnswer, correctAnswer) {
+      const userOptions = splitOptions(userAnswer);
+      const correctOptions = splitOptions(correctAnswer);
+
+      if (userOptions.length === 0) return false;
+
+      return correctOptions.some(correctOption =>
+        userOptions.some(userOption => userOption === correctOption)
+      );
+    }
+
+    function firstLetters(text) {
+      return text
+        .split('/')
+        .map(part => part.trim())
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + '…')
+        .join(' / ');
+    }
+
+    function setMessage(type, html) {
+      message.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'border-emerald-200', 'bg-rose-100', 'text-rose-800', 'border-rose-200');
+      message.classList.add('border');
+
+      if (type === 'success') {
+        message.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-200');
+      } else {
+        message.classList.add('bg-rose-100', 'text-rose-800', 'border-rose-200');
+      }
+
+      message.innerHTML = html;
+    }
+
+    function updateStats() {
+      const total = correct + wrong;
+      const rate = total === 0 ? 0 : Math.round((correct / total) * 100);
+
+      document.getElementById('correctCount').textContent = correct;
+      document.getElementById('wrongCount').textContent = wrong;
+      document.getElementById('streakCount').textContent = streak;
+      document.getElementById('successRate').textContent = rate + '%';
+    }
+
+    function clearInputs() {
+      fields.forEach(field => {
+        const input = document.getElementById(field);
+        input.value = '';
+        input.disabled = false;
+        input.classList.remove('border-emerald-400', 'border-rose-400', 'bg-emerald-50', 'bg-rose-50');
+      });
+    }
+
+    function newVerb() {
+      currentVerb = verbs[Math.floor(Math.random() * verbs.length)];
+      currentPromptField = fields[Math.floor(Math.random() * fields.length)];
+      alreadyChecked = false;
+
+      promptText.textContent = currentVerb[currentPromptField];
+      promptType.textContent = 'Te damos: ' + labels[currentPromptField];
+
+      clearInputs();
+      message.classList.add('hidden');
+      hintBox.classList.add('hidden');
+      hintBox.innerHTML = '';
+
+      const promptInput = document.getElementById(currentPromptField);
+      promptInput.value = currentVerb[currentPromptField];
+      promptInput.disabled = true;
+      promptInput.classList.add('bg-indigo-50', 'border-indigo-300');
+
+      const firstEmptyField = fields.find(field => field !== currentPromptField);
+      
+      if (window.matchMedia('(min-width: 768px)').matches) {
+        document.getElementById(firstEmptyField).focus();
+      }
+    }
+
+    function checkAnswers() {
+      if (alreadyChecked) return;
+
+      let allCorrect = true;
+      const mistakes = [];
+
+      fields.forEach(field => {
+        const input = document.getElementById(field);
+        const userAnswer = input.value;
+        const expectedAnswer = currentVerb[field];
+
+        input.classList.remove('border-emerald-400', 'border-rose-400', 'bg-emerald-50', 'bg-rose-50');
+
+        const correctField = field === currentPromptField || isAnswerCorrect(userAnswer, expectedAnswer);
+
+        if (correctField) {
+          input.classList.add('border-emerald-400', 'bg-emerald-50');
+        } else {
+          allCorrect = false;
+          input.classList.add('border-rose-400', 'bg-rose-50');
+          mistakes.push(`<li><strong>${labels[field]}:</strong> ${expectedAnswer}</li>`);
+        }
+      });
+
+      alreadyChecked = true;
+
+      if (allCorrect) {
+        correct++;
+        streak++;
+        setMessage('success', '🎉 ¡Perfecto! Muy buen trabajo. Sigue así.');
+      } else {
+        wrong++;
+        streak = 0;
+        setMessage('error', `💪 Casi lo tienes. Repasa estas formas:<ul class="mt-2 list-disc list-inside">${mistakes.join('')}</ul>`);
+      }
+
+      updateStats();
+    }
+
+    function showHint() {
+      const hints = fields
+        .filter(field => field !== currentPromptField)
+        .map(field => `<div><strong>${labels[field]}:</strong> ${firstLetters(currentVerb[field])}</div>`)
+        .join('');
+
+      hintBox.innerHTML = `<p class="mb-2 font-black">Pista:</p>${hints}`;
+      hintBox.classList.remove('hidden');
+    }
+
+    document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+    document.getElementById('hintBtn').addEventListener('click', showHint);
+    document.getElementById('nextBtn').addEventListener('click', newVerb);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      correct = 0;
+      wrong = 0;
+      streak = 0;
+      updateStats();
+      setMessage('success', 'Marcador reiniciado. ¡Nueva oportunidad para mejorar! 🚀');
+    });
+
+    document.getElementById('verbForm').addEventListener('submit', event => {
+      event.preventDefault();
+      checkAnswers();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        checkAnswers();
+      }
+    });
+
+    newVerb();
+  </script>
+</body>
+</html>
